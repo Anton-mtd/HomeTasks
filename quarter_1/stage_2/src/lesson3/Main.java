@@ -7,18 +7,9 @@ public class Main {
         String[] stringsArray = {"Андрей", "Стас", "Дмитрий", "Роман", "Ярослав",
                                  "Денис", "Станислав", "Евгений", "Леонид", "Константин",
                                  "Андрей", "Стас", "Дмитрий", "Андрей"};
-        Set<String> set = new HashSet<>(Arrays.asList(stringsArray));  // Создаем коллекцию типа Set чтобы убрать повторения
 
-        int counterTimes;  // переменная для подсчета повторений
-        for (String setElement : set) {
-            counterTimes = 0;
-            for (String string : stringsArray) {
-                if (setElement.equals(string)) {
-                    counterTimes++;
-                }
-            }
-            System.out.println("Значение \"" + setElement + "\" встречается в массиве " + counterTimes + " раз");
-        }
+        defineRepeatingInArray(stringsArray);
+
         System.out.println("______________________________________________");
 
         PhoneBook phoneBook = new PhoneBook();
@@ -35,5 +26,20 @@ public class Main {
         phoneBook.get("Кирсанова");
         phoneBook.get("Рябая");
         phoneBook.get("Сидоров");
+    }
+
+    public static void defineRepeatingInArray(String[] stringsArray){
+        Set<String> set = new HashSet<>(Arrays.asList(stringsArray));  // Создаем коллекцию типа Set чтобы убрать повторения
+
+        int counterTimes;  // переменная для подсчета повторений
+        for (String setElement : set) {
+            counterTimes = 0;
+            for (String string : stringsArray) {
+                if (setElement.equals(string)) {
+                    counterTimes++;
+                }
+            }
+            System.out.println("Значение \"" + setElement + "\" встречается в массиве " + counterTimes + " раз");
+        }
     }
 }
