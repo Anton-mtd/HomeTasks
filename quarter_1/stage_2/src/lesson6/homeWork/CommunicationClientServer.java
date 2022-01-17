@@ -16,8 +16,9 @@ abstract class CommunicationClientServer {
                     output.writeUTF(message);
                     System.exit(0);
                     break;
+                } else if (!message.isEmpty()){
+                    output.writeUTF(message);
                 }
-                output.writeUTF(message);
             } catch (IOException e) {
                 System.err.println("Не удалось отправить сообщение");
                 e.printStackTrace();
