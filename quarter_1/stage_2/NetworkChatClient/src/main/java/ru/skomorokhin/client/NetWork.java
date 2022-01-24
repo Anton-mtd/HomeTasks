@@ -1,4 +1,4 @@
-package lesson6.client;
+package ru.skomorokhin.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,12 +17,21 @@ public class NetWork {
     private DataInputStream socketInput;
     private DataOutputStream socketOutput;
 
+    private static NetWork INSTANCE;
+
+    public static NetWork getInstance() {
+        if (INSTANCE == null){
+            INSTANCE = new NetWork();
+        }
+        return INSTANCE;
+    }
+
     public NetWork(int port, String host) {
         this.port = port;
         this.host = host;
     }
 
-    public NetWork() {
+    private NetWork() {
         this(SERVER_PORT, SERVER_HOST);
     }
 
@@ -52,10 +61,11 @@ public class NetWork {
         Thread thread = new Thread(() -> {
             while (true) {
                 try {
+                    if (Thread.currentThread().isInterrupted()) {
+                        return;
+                    }
                     String message = this.socketInput.readUTF();
-
                     messageHandler.accept(message);
-
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.err.println("Не удалось прочитать сообщение от сервера");
