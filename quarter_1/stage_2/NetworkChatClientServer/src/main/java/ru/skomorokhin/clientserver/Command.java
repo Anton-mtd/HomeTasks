@@ -67,4 +67,10 @@ public class Command implements Serializable {
         return command;
     }
 
+    public static Command autTimeIsOverCommand(String errorMessage) {
+        Command command = new Command();
+        command.type = CommandType.AUTH_TIME_IS_OVER;
+        command.data = new AuthTimeIsOverCommandData (errorMessage);
+        return command;
+    }
 }

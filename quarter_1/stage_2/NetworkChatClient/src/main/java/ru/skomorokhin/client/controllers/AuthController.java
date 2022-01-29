@@ -13,16 +13,14 @@ import ru.skomorokhin.client.model.ReadCommandListener;
 import ru.skomorokhin.clientserver.Command;
 import ru.skomorokhin.clientserver.CommandType;
 import ru.skomorokhin.clientserver.commands.AuthOkCommandData;
+import ru.skomorokhin.clientserver.commands.AuthTimeIsOverCommandData;
 import ru.skomorokhin.clientserver.commands.ErrorCommandData;
 
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class AuthController {
 
-    public static final long AUTHENTICATING_TIME = 30000L;
     @FXML
     private TextField loginField;
     @FXML
@@ -60,14 +58,7 @@ public class AuthController {
     }
 
     public void initializeMessageHandler() {
-        Timer timer = new Timer("timer");
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                System.exit(0);
-            }
-        };
-        timer.schedule(task, AUTHENTICATING_TIME);
+        connectToServer();
         readMessageListener = getNetwork().addReadMessageListener(new ReadCommandListener() {
             @Override
             public void processReceivedCommand(Command command) {
@@ -75,12 +66,22 @@ public class AuthController {
                     AuthOkCommandData data = (AuthOkCommandData) command.getData();
                     String username = data.getUsername();
                     Platform.runLater(() -> ClientChat.INSTANCE.switchToMainChatWindow(username));
-                    timer.cancel();
                 } else if (command.getType() == CommandType.ERROR){
                     ErrorCommandData data = (ErrorCommandData) command.getData();
                     Platform.runLater(() -> {
                         Dialogs.AuthError.INVALID_CREDENTIALS.show(data.getErrorMessage());
                     });
+                } else if (command.getType() == CommandType.AUTH_TIME_IS_OVER){
+                    AuthTimeIsOverCommandData data = (AuthTimeIsOverCommandData) command.getData();
+                    Platform.runLater(() -> {
+                        Dialogs.AuthError.AUTH_TIME_IS_OVER.show(data.getAuthTimeIsOverMessage());
+                    });
+                    try {
+                        Thread.sleep(2000L);
+                        System.exit(0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

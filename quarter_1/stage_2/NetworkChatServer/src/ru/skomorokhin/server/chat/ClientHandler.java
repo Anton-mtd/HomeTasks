@@ -15,7 +15,7 @@ import java.util.TimerTask;
 
 public class ClientHandler {
 
-    public static final long timeForAuthentication = 30000L;
+    public static final long AUTHENTICATING_TIME = 120000L;
     private final MyServer server;
     private final Socket clientSocket;
     private ObjectInputStream inputStream;
@@ -50,6 +50,19 @@ public class ClientHandler {
     }
 
     private void authenticate() throws IOException {
+        Timer timer = new Timer("timer");
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    sendCommand(Command.autTimeIsOverCommand("Время для авторизации вышло"));
+                } catch (IOException e) {
+                    System.err.println("AuthTime is over");
+                }
+            }
+        };
+        timer.schedule(task, AUTHENTICATING_TIME);
+
         while (true) {
             Command command = readCommand();
             if (command == null) {
@@ -69,6 +82,7 @@ public class ClientHandler {
                     this.userName = userName;
                     sendCommand(Command.authOkCommand(userName));
                     server.subscribe(this);
+                    timer.cancel();
                     return;
                 }
             }
