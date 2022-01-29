@@ -1,5 +1,6 @@
 package ru.skomorokhin.server.chat;
 
+import ru.skomorokhin.clientserver.Command;
 import ru.skomorokhin.server.chat.auth.AuthService;
 
 import java.io.IOException;
@@ -13,6 +14,10 @@ public class MyServer {
     private final List<ClientHandler> clients = new ArrayList<>();
     private AuthService authService;
 
+    public AuthService getAuthService() {
+        return authService;
+    }
+
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server has been started");
@@ -20,6 +25,7 @@ public class MyServer {
             while (true) {
                 waitAndProcessClientConnection(serverSocket);
             }
+
         } catch (IOException e) {
             System.err.println("Failed to bind port " + port);
             e.printStackTrace();
@@ -34,38 +40,52 @@ public class MyServer {
         clientHandler.handle();
     }
 
-    public void broadcastMessage(String message, ClientHandler sender) throws IOException {
-        if (message.contains("/w")) {
-            String[] parts = message.split(" ");
-            String userName = parts[1];
-            for (ClientHandler client : clients) {
-                if (client.getUserName().equals(userName)) {
-                    String refactorMessage = message.substring((parts[0].length() + parts[1].length() +1));  // отрезаем "/w userName" от сообщения и направляем все что после
-                    client.sendMessage(refactorMessage);
-                }
+    public synchronized boolean isUsernameBusy(String username) {
+        for (ClientHandler client : clients) {
+            if (client.getUserName().equals(username)) {
+                return true;
             }
-        } else {
-            for (ClientHandler client : clients) {
-                if (client != sender) {
-                    client.sendMessage(message);
-                }
+        }
+        return false;
+    }
+
+    public synchronized void broadcastMessage(String message, ClientHandler sender) throws IOException {
+        for (ClientHandler client : clients) {
+            if (client != sender) {
+                System.out.println("clientMessageCommand");
+                client.sendCommand(Command.clientMessageCommand(sender.getUserName(), message));
             }
         }
     }
 
-    public void subscribe(ClientHandler clientHandler) {
-        this.clients.add(clientHandler);
+    public synchronized void sendPrivateMessage(ClientHandler sender, String recipient, String privateMessage) throws IOException {
+        for (ClientHandler client : clients) {
+            if (client != sender && client.getUserName().equals(recipient)) {
+                client.sendCommand(Command.clientMessageCommand(sender.getUserName(), privateMessage));
+                break;
+            }
+        }
     }
 
-    public void unSubscribe(ClientHandler clientHandler) {
-        this.clients.remove(clientHandler);
+    public synchronized void subscribe(ClientHandler clientHandler) throws IOException {
+        clients.add(clientHandler);
+        notifyClientUserListUpdated();
     }
 
-    public AuthService getAuthService() {
-        return authService;
+    public synchronized void unsubscribe(ClientHandler clientHandler) throws IOException {
+        clients.remove(clientHandler);
+        notifyClientUserListUpdated();
     }
 
-    public List<ClientHandler> getClients() {
-        return clients;
+    private void notifyClientUserListUpdated() throws IOException {
+        List<String> userListOnline = new ArrayList<>();
+
+        for (ClientHandler client : clients) {
+            userListOnline.add(client.getUserName());
+        }
+
+        for (ClientHandler client : clients) {
+            client.sendCommand(Command.updateUserListCommand(userListOnline));
+        }
     }
 }
