@@ -1,67 +1,43 @@
 package ru.skomorokhin.lesson1.homeWork.task3;
 
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Box<E extends Fruit> {
 
-    List<E> fruitList;
-    private FruitType fruitType;
+    private List<E> fruits = new ArrayList<>();
 
-    public Box() {
-        fruitList = new ArrayList<E>();
-        fruitType = null;
+    public Box(List<E> fruits) {
+        this.fruits.addAll(fruits);
     }
 
-    private enum FruitType {
-        APPLE, ORANGE,
+    public Box(E... fruits) {
+        this.fruits.addAll(Arrays.asList(fruits));
     }
 
-    public void addFruit(E fruit) {
-        if (fruitList.isEmpty()) {
-            if (fruit instanceof Apple) {
-                fruitType = FruitType.APPLE;
-                fruitList.add(fruit);
-            } else if (fruit instanceof Orange) {
-                fruitType = FruitType.ORANGE;
-                fruitList.add(fruit);
-            }
-        } else if (fruitList.get(0).getClass() == fruit.getClass()) {
-            fruitList.add(fruit);
-        } else {
-            System.out.println("фрукт несовместим для добавления");
+    public void add(E fruit) {
+        fruits.add(fruit);
+    }
+
+    public void moveAllTo(Box<E> anotherBox) {
+        for (E fruit : fruits) {
+            anotherBox.add(fruit);
         }
+
+        fruits.clear();
     }
 
-    public float getWeight() {
-        float totalWeight = 0;
-        for (E fruit : fruitList) {
-            totalWeight += fruit.getWeight();
+    public boolean compareTo(Box<?> anotherBox) {
+        return Math.abs(this.getWeight() - anotherBox.getWeight()) < 0.0001;
+    }
+
+    public double getWeight() {
+        double sum = 0.0;
+        for (E fruit : fruits) {
+            sum += fruit.getWeight();
         }
-        return totalWeight;
+        return sum;
     }
 
-    public boolean compare(Box box) {
-        if (this.getWeight() == box.getWeight()) {
-            return true;
-        } else return false;
-    }
-
-    public void putInOtherBox(Box box) {
-        if (this.fruitType == box.fruitType) {
-            box.fruitList.addAll(this.fruitList);
-            this.fruitList.clear();
-            this.fruitType = null;
-        } else if (box.fruitList.isEmpty()) {
-            box.fruitList.addAll(this.fruitList);
-            this.fruitList.clear();
-            box.fruitType = this.fruitType;
-            this.fruitType = null;
-        } else if (this.fruitType == null) {
-            System.out.println("коробка пустая, нечего пересыпать");
-        } else {
-            System.out.println("Фрукты в данных коробках несовместимы");
-        }
-    }
 }

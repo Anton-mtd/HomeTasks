@@ -1,14 +1,8 @@
 package ru.skomorokhin.lesson1.homeWork.task3;
 
-public abstract class Fruit {
+public interface Fruit {
 
-    private float weight;
+    String getName();
 
-    public float getWeight() {
-        return weight;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
+    double getWeight();
 }
