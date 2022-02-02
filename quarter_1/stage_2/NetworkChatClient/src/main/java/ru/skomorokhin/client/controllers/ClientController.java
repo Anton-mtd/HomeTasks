@@ -2,14 +2,13 @@ package ru.skomorokhin.client.controllers;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import ru.skomorokhin.client.ClientChat;
 import ru.skomorokhin.client.model.Network;
 import ru.skomorokhin.client.model.ReadCommandListener;
+import ru.skomorokhin.client.model.dialogs.Dialogs;
 import ru.skomorokhin.clientserver.Command;
 import ru.skomorokhin.clientserver.CommandType;
 import ru.skomorokhin.clientserver.commands.ClientMessageCommandData;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class ClientController {
 
@@ -106,5 +106,30 @@ public class ClientController {
                 }
             }
         });
+    }
+
+    public void close(ActionEvent actionEvent) {
+        ClientChat.INSTANCE.getChatStage().close();
+    }
+
+    public void updateUsername(ActionEvent actionEvent) {
+        TextInputDialog editDialog = new TextInputDialog();
+        editDialog.setTitle("Изменить имя пользователя");
+        editDialog.setHeaderText("Введите новое имя мпользователя");
+        editDialog.setContentText("Username:");
+
+        Optional <String> result = editDialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                Network.getInstance().updateUsername(result.get());
+            } catch (IOException e) {
+                e.printStackTrace();
+                Dialogs.NetworkError.SEND_MESSAGE.show();
+            }
+        }
+    }
+
+    public void about(ActionEvent actionEvent) {
+        Dialogs.AboutDialog.INFO.show();
     }
 }

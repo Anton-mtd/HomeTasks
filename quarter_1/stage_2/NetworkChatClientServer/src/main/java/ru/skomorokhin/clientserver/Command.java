@@ -73,4 +73,11 @@ public class Command implements Serializable {
         command.data = new AuthTimeIsOverCommandData (errorMessage);
         return command;
     }
+
+    public static Command updateUsernameCommand(String newUsername){
+        Command command = new Command();
+        command.type = CommandType.UPDATE_USERNAME;
+        command.data = new UpdateUsernameCommandData(newUsername);
+        return command;
+    }
 }
