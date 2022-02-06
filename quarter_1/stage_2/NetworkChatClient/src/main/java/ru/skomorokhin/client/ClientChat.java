@@ -1,6 +1,8 @@
 package ru.skomorokhin.client;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import ru.skomorokhin.client.controllers.AuthController;
 import ru.skomorokhin.client.controllers.ClientController;
@@ -26,9 +29,15 @@ public class ClientChat extends Application {
     private FXMLLoader chatWindowLoader;
     private FXMLLoader authLoader;
 
+    private String pathToFileMessageHistory;
+
     @Override
     public void init() throws Exception {
         INSTANCE = this;
+    }
+
+    public static void main(String[] args) {
+        launch();
     }
 
     @Override
@@ -52,6 +61,12 @@ public class ClientChat extends Application {
 
         Parent root = chatWindowLoader.load();
         this.primaryStage.setScene(new Scene(root));
+        this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                getChatController().close();
+            }
+        });
     }
 
     private void initAuthDialog() throws java.io.IOException {
@@ -63,6 +78,12 @@ public class ClientChat extends Application {
         authStage.initOwner(primaryStage);
         authStage.initModality(Modality.WINDOW_MODAL);
         authStage.setScene(new Scene(authDialogPanel));
+        authStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                System.exit(0);
+            }
+        });
     }
 
     private void connectToServer(ClientController clientController) {
@@ -104,11 +125,7 @@ public class ClientChat extends Application {
         return authStage;
     }
 
-    public static void main(String[] args) {
-        launch();
-    }
-
-    private AuthController getAuthController() {
+    public AuthController getAuthController() {
         return authLoader.getController();
     }
 
@@ -118,5 +135,13 @@ public class ClientChat extends Application {
 
     public Stage getChatStage() {
         return this.primaryStage;
+    }
+
+    public String getPathToFileMessageHistory() {
+        return pathToFileMessageHistory;
+    }
+
+    public void setPathToFileMessageHistory(String pathToFileMessageHistory) {
+        this.pathToFileMessageHistory = pathToFileMessageHistory;
     }
 }
