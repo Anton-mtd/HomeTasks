@@ -6,7 +6,7 @@ public class User {
 
     private final String login;
     private final String password;
-    private final String userName;
+    private String userName;
 
     public User(String login, String password, String userName) {
         this.login = login;
@@ -30,6 +30,10 @@ public class User {
         return userName;
     }
 
+    public void setUsername(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -42,4 +46,6 @@ public class User {
     public int hashCode() {
         return Objects.hash(login, password);
     }
+
+
 }

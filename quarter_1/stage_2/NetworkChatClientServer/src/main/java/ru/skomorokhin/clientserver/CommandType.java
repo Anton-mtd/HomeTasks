@@ -9,5 +9,6 @@ public enum CommandType {
     CLIENT_MESSAGE,
     END,
     UPDATE_USER_LIST,
-    AUTH_TIME_IS_OVER
+    AUTH_TIME_IS_OVER,
+    UPDATE_USERNAME
 }
