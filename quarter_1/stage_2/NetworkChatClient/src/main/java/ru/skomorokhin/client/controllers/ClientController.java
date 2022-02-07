@@ -19,14 +19,13 @@ import ru.skomorokhin.clientserver.commands.ClientMessageCommandData;
 import ru.skomorokhin.clientserver.commands.UpdateUserListCommandData;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 public class ClientController {
-
-    private static final List<String> USER_TEST_DATA = List.of("username1", "username2", "username3");
 
     @FXML
     private TextArea textArea;
@@ -41,15 +40,13 @@ public class ClientController {
 
     private JSONArray messagesHistory = new JSONArray();
 
-    public void initialize() {
-        userList.setItems(FXCollections.observableList(USER_TEST_DATA));
-    }
 
-    private void initMessagesHistory() {
-        if (!messagesHistory.isEmpty()) {
+    public void initMessagesHistory() {
+        File file = new File(ClientChat.INSTANCE.getPathToFileMessageHistory());
+        if (file.length() > 0) {
             try {
                 JSONParser parser = new JSONParser();
-                Reader fileReader = new FileReader(ClientChat.INSTANCE.getPathToFileMessageHistory());
+                Reader fileReader = new FileReader(ClientChat.INSTANCE.getPathToFileMessageHistory(), StandardCharsets.UTF_8);
                 messagesHistory = (JSONArray) parser.parse(fileReader);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -123,7 +120,6 @@ public class ClientController {
     }
 
     public void initializeMessageHandler() {
-        initMessagesHistory();
         Network.getInstance().addReadMessageListener(new ReadCommandListener() {
             @Override
             public void processReceivedCommand(Command command) {
@@ -143,10 +139,10 @@ public class ClientController {
         });
     }
 
-    public void fillHistoryFile () {
-        try (FileWriter fileWriter = new FileWriter(ClientChat.INSTANCE.getPathToFileMessageHistory())){
+    public void fillHistoryFile() {
+        try (FileWriter fileWriter = new FileWriter(ClientChat.INSTANCE.getPathToFileMessageHistory(), StandardCharsets.UTF_8)) {
             fileWriter.write(messagesHistory.toJSONString());
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -22,6 +22,7 @@ public class ClientHandler {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private String userName;
+    private Timer timer = new Timer("timer");
 
     public ClientHandler(MyServer server, Socket clientSocket) {
         this.server = server;
@@ -34,6 +35,7 @@ public class ClientHandler {
 
         new Thread(() -> {
             try {
+                timerStart(timer);
                 authenticate();
                 readMessages();
             } catch (IOException e) {
@@ -50,8 +52,7 @@ public class ClientHandler {
 
     }
 
-    private void authenticate() throws IOException {
-        Timer timer = new Timer("timer");
+    private void timerStart(Timer timer) {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -63,7 +64,9 @@ public class ClientHandler {
             }
         };
         timer.schedule(task, AUTHENTICATING_TIME);
+    }
 
+    private void authenticate() throws IOException {
         while (true) {
             Command command = readCommand();
             if (command == null) {

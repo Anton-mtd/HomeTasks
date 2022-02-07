@@ -1,8 +1,6 @@
 package ru.skomorokhin.client;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import ru.skomorokhin.client.controllers.AuthController;
 import ru.skomorokhin.client.controllers.ClientController;
@@ -110,6 +107,7 @@ public class ClientChat extends Application {
     public void switchToMainChatWindow(String username) {
         getChatStage().setTitle(username);
         getChatController().initializeMessageHandler();
+        getChatController().initMessagesHistory();
         getAuthController().close();
         getAuthStage().close();
     }
