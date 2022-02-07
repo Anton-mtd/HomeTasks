@@ -5,6 +5,10 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import ru.skomorokhin.client.ClientChat;
 import ru.skomorokhin.client.model.Network;
 import ru.skomorokhin.client.model.ReadCommandListener;
@@ -14,15 +18,14 @@ import ru.skomorokhin.clientserver.CommandType;
 import ru.skomorokhin.clientserver.commands.ClientMessageCommandData;
 import ru.skomorokhin.clientserver.commands.UpdateUserListCommandData;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 public class ClientController {
-
-    private static final List<String> USER_TEST_DATA = List.of("username1", "username2", "username3");
 
     @FXML
     private TextArea textArea;
@@ -35,8 +38,25 @@ public class ClientController {
 
     private ClientChat application;
 
-    public void initialize() {
-        userList.setItems(FXCollections.observableList(USER_TEST_DATA));
+    private JSONArray messagesHistory = new JSONArray();
+
+
+    public void initMessagesHistory() {
+        File file = new File(ClientChat.INSTANCE.getPathToFileMessageHistory());
+        if (file.length() > 0) {
+            try {
+                JSONParser parser = new JSONParser();
+                Reader fileReader = new FileReader(ClientChat.INSTANCE.getPathToFileMessageHistory(), StandardCharsets.UTF_8);
+                messagesHistory = (JSONArray) parser.parse(fileReader);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            for (Object o : messagesHistory) {
+                textArea.appendText(o.toString());
+            }
+        }
     }
 
     public void sendMessage() {
@@ -68,17 +88,28 @@ public class ClientController {
     }
 
     private void appendMessageToChat(String sender, String message) {
-        textArea.appendText(DateFormat.getDateTimeInstance().format(new Date()));
+        String date = DateFormat.getDateTimeInstance().format(new Date());
+        textArea.appendText(date);
         textArea.appendText(System.lineSeparator());
 
         if (sender != null) {
             textArea.appendText(sender + ":");
             textArea.appendText(System.lineSeparator());
         }
-
         textArea.appendText(message);
         textArea.appendText(System.lineSeparator());
         textArea.appendText(System.lineSeparator());
+        String messageForHistory = date
+                + System.lineSeparator()
+                + sender
+                + ":" + System.lineSeparator()
+                + message
+                + System.lineSeparator()
+                + System.lineSeparator();
+        if (messagesHistory.size() == 100) {
+            messagesHistory.remove(0);
+        }
+        messagesHistory.add(messageForHistory);
         textField.setFocusTraversable(true);
         textField.clear();
     }
@@ -108,7 +139,16 @@ public class ClientController {
         });
     }
 
-    public void close(ActionEvent actionEvent) {
+    public void fillHistoryFile() {
+        try (FileWriter fileWriter = new FileWriter(ClientChat.INSTANCE.getPathToFileMessageHistory(), StandardCharsets.UTF_8)) {
+            fileWriter.write(messagesHistory.toJSONString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void close() {
+        fillHistoryFile();
         ClientChat.INSTANCE.getChatStage().close();
     }
 
@@ -118,7 +158,7 @@ public class ClientController {
         editDialog.setHeaderText("Введите новое имя мпользователя");
         editDialog.setContentText("Username:");
 
-        Optional <String> result = editDialog.showAndWait();
+        Optional<String> result = editDialog.showAndWait();
         if (result.isPresent()) {
             try {
                 Network.getInstance().updateUsername(result.get());

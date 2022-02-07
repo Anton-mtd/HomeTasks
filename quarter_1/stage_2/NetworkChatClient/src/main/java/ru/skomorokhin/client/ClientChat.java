@@ -26,9 +26,15 @@ public class ClientChat extends Application {
     private FXMLLoader chatWindowLoader;
     private FXMLLoader authLoader;
 
+    private String pathToFileMessageHistory;
+
     @Override
     public void init() throws Exception {
         INSTANCE = this;
+    }
+
+    public static void main(String[] args) {
+        launch();
     }
 
     @Override
@@ -52,6 +58,12 @@ public class ClientChat extends Application {
 
         Parent root = chatWindowLoader.load();
         this.primaryStage.setScene(new Scene(root));
+        this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                getChatController().close();
+            }
+        });
     }
 
     private void initAuthDialog() throws java.io.IOException {
@@ -63,6 +75,12 @@ public class ClientChat extends Application {
         authStage.initOwner(primaryStage);
         authStage.initModality(Modality.WINDOW_MODAL);
         authStage.setScene(new Scene(authDialogPanel));
+        authStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                System.exit(0);
+            }
+        });
     }
 
     private void connectToServer(ClientController clientController) {
@@ -89,6 +107,7 @@ public class ClientChat extends Application {
     public void switchToMainChatWindow(String username) {
         getChatStage().setTitle(username);
         getChatController().initializeMessageHandler();
+        getChatController().initMessagesHistory();
         getAuthController().close();
         getAuthStage().close();
     }
@@ -104,11 +123,7 @@ public class ClientChat extends Application {
         return authStage;
     }
 
-    public static void main(String[] args) {
-        launch();
-    }
-
-    private AuthController getAuthController() {
+    public AuthController getAuthController() {
         return authLoader.getController();
     }
 
@@ -118,5 +133,13 @@ public class ClientChat extends Application {
 
     public Stage getChatStage() {
         return this.primaryStage;
+    }
+
+    public String getPathToFileMessageHistory() {
+        return pathToFileMessageHistory;
+    }
+
+    public void setPathToFileMessageHistory(String pathToFileMessageHistory) {
+        this.pathToFileMessageHistory = pathToFileMessageHistory;
     }
 }

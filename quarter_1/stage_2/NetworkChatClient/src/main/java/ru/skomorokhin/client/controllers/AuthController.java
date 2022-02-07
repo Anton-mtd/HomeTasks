@@ -17,6 +17,7 @@ import ru.skomorokhin.clientserver.commands.AuthTimeIsOverCommandData;
 import ru.skomorokhin.clientserver.commands.ErrorCommandData;
 
 
+import java.io.File;
 import java.io.IOException;
 
 public class AuthController {
@@ -29,7 +30,6 @@ public class AuthController {
     private Button authButton;
 
     private ReadCommandListener readMessageListener;
-
 
     public void executeAuth(ActionEvent actionEvent) {
         String login = loginField.getText();
@@ -46,6 +46,7 @@ public class AuthController {
 
         try {
             Network.getInstance().sendAuthMessage(login, password);
+            ClientChat.INSTANCE.setPathToFileMessageHistory("src/main/resources/messagesHistory/" + login + "_MessagesHistory.json");
         } catch (IOException e) {
             Dialogs.NetworkError.SEND_MESSAGE.show();
             e.printStackTrace();
@@ -65,6 +66,7 @@ public class AuthController {
                 if (command.getType() == CommandType.AUTH_OK) {
                     AuthOkCommandData data = (AuthOkCommandData) command.getData();
                     String username = data.getUsername();
+                    createFileMessagesHistory(ClientChat.INSTANCE.getPathToFileMessageHistory());
                     Platform.runLater(() -> ClientChat.INSTANCE.switchToMainChatWindow(username));
                 } else if (command.getType() == CommandType.ERROR){
                     ErrorCommandData data = (ErrorCommandData) command.getData();
@@ -93,6 +95,17 @@ public class AuthController {
 
     private Network getNetwork() {
         return Network.getInstance();
+    }
+
+    private void createFileMessagesHistory(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
