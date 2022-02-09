@@ -150,6 +150,7 @@ public class ClientController {
     public void close() {
         fillHistoryFile();
         ClientChat.INSTANCE.getChatStage().close();
+        Network.getInstance().close();
     }
 
     public void updateUsername(ActionEvent actionEvent) {

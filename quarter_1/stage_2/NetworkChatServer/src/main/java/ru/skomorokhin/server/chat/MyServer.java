@@ -8,11 +8,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MyServer {
 
     private final List<ClientHandler> clients = new ArrayList<>();
     private IAuthService authService;
+
+    private ExecutorService executorService;
 
     public IAuthService getAuthService() {
         return authService;
@@ -23,6 +27,7 @@ public class MyServer {
             System.out.println("Server has been started");
             authService = createAuthService();
             authService.start();
+            executorService = Executors.newCachedThreadPool();
             while (true) {
                 waitAndProcessClientConnection(serverSocket);
             }
@@ -33,6 +38,9 @@ public class MyServer {
         } finally {
             if (authService != null) {
                 authService.stop();
+            }
+            if (executorService != null) {
+                executorService.shutdown();
             }
         }
     }
@@ -97,5 +105,9 @@ public class MyServer {
         for (ClientHandler client : clients) {
             client.sendCommand(Command.updateUserListCommand(userListOnline));
         }
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 }
