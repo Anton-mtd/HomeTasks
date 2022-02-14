@@ -5,8 +5,6 @@ import java.util.concurrent.Semaphore;
 
 public class Car implements Runnable {
 
-    Semaphore semaphore = new Semaphore(1);
-
     private static int CARS_COUNT;
     private Race race;
     private int speed;
