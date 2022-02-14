@@ -33,6 +33,7 @@ public class MainClass {
 
         executorService.shutdown();
         System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка закончилась!!!");
+        System.out.println("Победитель гонки: " + race.getWinner());
     }
 
 

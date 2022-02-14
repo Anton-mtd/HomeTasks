@@ -1,8 +1,11 @@
 package ru.skomorokhin.lesson5.homeWork;
 
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Semaphore;
 
 public class Car implements Runnable {
+
+    Semaphore semaphore = new Semaphore(1);
 
     private static int CARS_COUNT;
     private Race race;
@@ -35,6 +38,9 @@ public class Car implements Runnable {
         }
         for (int i = 0; i < race.getStages().size(); i++) {
             race.getStages().get(i).go(this);
+        }
+        if (race.getWinner() == null){
+            race.setWinner(this.name);
         }
     }
 }
