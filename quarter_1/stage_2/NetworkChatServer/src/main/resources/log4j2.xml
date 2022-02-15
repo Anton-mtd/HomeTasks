@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="basePath">NetworkChatServer/src/main/resources/logs</Property>
+    </Properties>
+
+    <Appenders>
+
+        <File name="FILE_TRACE" fileName="${basePath}/traceLogfile.log" append="true">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L) -
+%m%n"/>
+            <LevelRangeFilter minLevel="TRACE" maxLevel="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
+        </File>
+
+        <File name="FILE_INFO" fileName="${basePath}/infoLogfile.log" append="true">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L) -
+%m%n"/>
+            <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </File>
+
+        <File name="FILE_ERROR" fileName="${basePath}/errorLogfile.log" append="true">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L) -
+%m%n"/>
+            <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+        </File>
+
+    </Appenders>
+
+    <Loggers>
+
+        <Root level="trace" additivity="false">
+            <AppenderRef ref="FILE_TRACE"/>
+            <AppenderRef ref="FILE_INFO"/>
+            <AppenderRef ref="FILE_ERROR"/>
+        </Root>
+
+    </Loggers>
+</Configuration>
