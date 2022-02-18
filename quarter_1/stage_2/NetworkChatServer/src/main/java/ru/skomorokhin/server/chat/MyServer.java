@@ -1,6 +1,9 @@
 package ru.skomorokhin.server.chat;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.skomorokhin.clientserver.Command;
+import ru.skomorokhin.server.ServerApp;
 import ru.skomorokhin.server.chat.auth.*;
 
 import java.io.IOException;
@@ -15,6 +18,7 @@ public class MyServer {
 
     private final List<ClientHandler> clients = new ArrayList<>();
     private IAuthService authService;
+    private final Logger logger = LogManager.getLogger(MyServer.class);
 
     private ExecutorService executorService;
 
@@ -25,6 +29,7 @@ public class MyServer {
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server has been started");
+            logger.info("Server has been started");
             authService = createAuthService();
             authService.start();
             executorService = Executors.newCachedThreadPool();
@@ -34,6 +39,7 @@ public class MyServer {
 
         } catch (IOException e) {
             System.err.println("Failed to bind port " + port);
+            logger.error("Failed to bind port " + port);
             e.printStackTrace();
         } finally {
             if (authService != null) {
@@ -54,6 +60,7 @@ public class MyServer {
         System.out.println("Waiting for new client connection");
         Socket clientSocket = serverSocket.accept();
         System.out.println("Client has been connected");
+        logger.info("Client has been connected");
         ClientHandler clientHandler = new ClientHandler(this, clientSocket);
         clientHandler.handle();
     }
@@ -109,5 +116,9 @@ public class MyServer {
 
     public ExecutorService getExecutorService() {
         return executorService;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 }

@@ -117,17 +117,20 @@ public class ClientHandler {
 
             switch (command.getType()) {
                 case END:
+                    server.getLogger().trace("END");
                     return;
                 case PRIVATE_MESSAGE: {
                     PrivateMessageCommandData data = (PrivateMessageCommandData) command.getData();
                     String recipient = data.getReceiver();
                     String privateMessage = data.getMessage();
                     server.sendPrivateMessage(this, recipient, privateMessage);
+                    server.getLogger().trace("PRIVATE_MESSAGE");
                     break;
                 }
                 case PUBLIC_MESSAGE: {
                     PublicMessageCommandData data = (PublicMessageCommandData) command.getData();
                     processMessage(data.getMessage());
+                    server.getLogger().trace("PUBLIC_MESSAGE");
                     break;
                 }
                 case UPDATE_USERNAME: {
