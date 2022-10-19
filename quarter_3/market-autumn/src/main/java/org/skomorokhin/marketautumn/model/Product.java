@@ -1,4 +1,4 @@
-package org.skomorokhin.marketautumn.dto;
+package org.skomorokhin.marketautumn.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +13,6 @@ public class Product {
 
     private String title;
 
-    private long price;
+    private Long price;
 
 }
