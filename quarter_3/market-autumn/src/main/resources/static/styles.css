@@ -1,0 +1,29 @@
+
+#headerDiv ul
+{
+    float : left;
+    width : 100%;
+    padding-left : 0;
+    margin : 0 0 20px 0;
+    font-size : 110%;
+    border-top : 1px solid #fff;
+    border-bottom : 1px solid #fff;
+    background : silver;
+}
+
+#headerDiv ul li
+{
+    display : inline;
+}
+
+#headerDiv ul li a
+{
+    float : left;
+    padding : 0.2em 1em;
+    text-decoration : none;
+    border-right : 1px solid #fff;
+    background : gray;
+    color : #fff;
+}
+
+
