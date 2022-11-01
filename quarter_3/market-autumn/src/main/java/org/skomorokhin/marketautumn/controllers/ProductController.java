@@ -15,14 +15,19 @@ import java.util.TreeSet;
 public class ProductController {
 
     private final ProductService productService;
+    private TreeSet <Product> productsList;
     private TreeSet <Customer> selectedCustomerList;
     private Product selectedProduct;
 
+    @PostMapping("/product/setList")
+    public void setProductsList() {
+        productsList = productService.getAllProducts();
+    }
 
-    @GetMapping("/product/all")
+    @GetMapping("/product/products")
     @ResponseBody
     public TreeSet<Product> getAllProducts() {
-        return productService.getAllProducts();
+        return productsList;
     }
 
     @GetMapping("/product/change_price")
@@ -63,6 +68,10 @@ public class ProductController {
         return selectedProduct;
     }
 
-
-
+    @GetMapping("/product/filterPrice")
+    @ResponseBody
+    public TreeSet<Product> getProductByPriceFilter(@RequestParam Integer min, @RequestParam Integer max) {
+        productsList = productService.getProductsByPrice(min, max);
+        return productsList;
+    }
 }
