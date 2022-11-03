@@ -4,9 +4,15 @@ var app = angular.module('app',[]);
 app.controller('productsController', function ($scope, $http) {
     const contextPath = "/app";
 
+    $scope.setProducts = function () {
+        $http({
+            url: contextPath + '/product/setList',
+            method: 'POST'
+        });
+    };
 
     $scope.loadProducts = function () {
-        $http.get(contextPath + "/product/all")
+        $http.get(contextPath + "/product/products")
             .then(function (response) {
                 $scope.productsList = response.data;
             });
@@ -64,6 +70,22 @@ app.controller('productsController', function ($scope, $http) {
         });
     };
 
+    $scope.loadProductsByPrice = function () {
+        $http({
+            url: contextPath + '/product/filterPrice',
+            method: 'GET',
+            params: {
+                min: $scope.p_price_min,
+                max: $scope.p_price_max
+            }
+        }).then(function (response) {
+            $scope.productsList = response.data;
+        }).then(function (response) {
+            $scope.loadProducts();
+        });
+    };
+
+    $scope.setProducts();
     $scope.loadProducts();
 
 })

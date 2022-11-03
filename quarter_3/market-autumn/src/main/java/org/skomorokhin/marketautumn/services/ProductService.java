@@ -49,4 +49,8 @@ public class ProductService {
         return  customers;
     }
 
+    public TreeSet<Product> getProductsByPrice(Integer min, Integer max) {
+
+        return productRepository.findAllByPriceBetween(min,max);
+    }
 }
