@@ -10,7 +10,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "products")
-public class Product implements Comparable<Product> {
+public class Product {
 
     public Product(String title, Integer price) {
         this.title = title;
@@ -78,8 +78,4 @@ public class Product implements Comparable<Product> {
                 '}';
     }
 
-    @Override
-    public int compareTo(Product o) {
-        return this.getId().compareTo(o.id);
-    }
 }

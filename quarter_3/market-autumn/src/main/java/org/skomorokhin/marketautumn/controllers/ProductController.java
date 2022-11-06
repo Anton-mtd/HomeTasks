@@ -1,77 +1,48 @@
 package org.skomorokhin.marketautumn.controllers;
 
-
 import lombok.RequiredArgsConstructor;
-import org.skomorokhin.marketautumn.model.Customer;
 import org.skomorokhin.marketautumn.model.Product;
 import org.skomorokhin.marketautumn.services.ProductService;
-import org.springframework.stereotype.Controller;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.TreeSet;
 
-@Controller
+@RestController
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
-    private TreeSet <Product> productsList;
-    private TreeSet <Customer> selectedCustomerList;
-    private Product selectedProduct;
 
-    @PostMapping("/product/setList")
-    public void setProductsList() {
-        productsList = productService.getAllProducts();
-    }
 
-    @GetMapping("/product/products")
-    @ResponseBody
-    public TreeSet<Product> getAllProducts() {
-        return productsList;
-    }
-
-    @GetMapping("/product/change_price")
-    @ResponseBody
-    public void changeProductPrice(@RequestParam Integer productId, @RequestParam Integer delta) {
-        productService.ChangeProductPrice(productId, delta);
+    @GetMapping("/showAll")
+    public Page<Product> getAllProducts(@RequestParam (name = "page", defaultValue = "1") Integer page,
+                                        @RequestParam(name = "min_price", required = false) Integer minPrice,
+                                        @RequestParam(name = "max_price", required = false) Integer maxPrice
+    ) {
+        if (page < 1) {
+            page = 1;
+        }
+        return productService.find(page, minPrice, maxPrice);
     }
 
 
-    @GetMapping ("/product/add")
-    @ResponseBody
-    public void addProduct(@RequestParam String title, @RequestParam Integer price) {
+    @PostMapping ("/product")
+    public void add(@RequestParam String title, @RequestParam Integer price) {
         Product product = new Product(title,price);
         productService.addProduct(product);
     }
 
-    @DeleteMapping("/product/delete")
-    @ResponseBody
+    @PutMapping("/product")
+    public void update(@RequestParam Integer id, @RequestParam String title, @RequestParam Integer price) {
+        Product product = new Product(title,price);
+        product.setId(id);
+        productService.addProduct(product);
+    }
+
+    @DeleteMapping("/product")
     public void deleteProductById(@RequestParam Integer id) {
         productService.deleteById(id);
     }
 
-    @PostMapping("/product/customerList")
-    public void setSelectedCustomerList(@RequestParam Integer id) {
-        selectedProduct = productService.getProductByID(id);
-        selectedCustomerList = productService.getProductCustomers(selectedProduct);
-    }
-
-    @GetMapping("/product/customerList")
-    @ResponseBody
-    public TreeSet<Customer> getSelectedCustomerList() {
-        return selectedCustomerList;
-    }
-
-    @GetMapping("/product/current")
-    @ResponseBody
-    public Product getSelectedProduct() {
-        return selectedProduct;
-    }
-
-    @GetMapping("/product/filterPrice")
-    @ResponseBody
-    public TreeSet<Product> getProductByPriceFilter(@RequestParam Integer min, @RequestParam Integer max) {
-        productsList = productService.getProductsByPrice(min, max);
-        return productsList;
-    }
 }
