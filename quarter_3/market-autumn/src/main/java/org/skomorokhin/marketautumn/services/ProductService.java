@@ -2,16 +2,20 @@ package org.skomorokhin.marketautumn.services;
 
 
 import lombok.RequiredArgsConstructor;
+import org.skomorokhin.marketautumn.converters.ProductConverter;
+import org.skomorokhin.marketautumn.dto.CustomerDto;
 import org.skomorokhin.marketautumn.dto.ProductDto;
-import org.skomorokhin.marketautumn.model.Customer;
-import org.skomorokhin.marketautumn.model.Product;
+import org.skomorokhin.marketautumn.exceptions.ValidateException;
+import org.skomorokhin.marketautumn.model.entities.Product;
 import org.skomorokhin.marketautumn.repositories.ProductRepository;
 import org.skomorokhin.marketautumn.repositories.specification.ProductSpecification;
+import org.skomorokhin.marketautumn.validators.ProductValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 
@@ -20,37 +24,43 @@ import java.util.*;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductValidator productValidator;
 
-    public Page<Product> find(Integer p, Integer minPrice, Integer maxPrice) {
+    public Page<ProductDto> find(Integer p, Integer minPrice, Integer maxPrice) {
         Specification<Product> spec = Specification.where(null);
         if (minPrice != null) {
             spec = spec.and(ProductSpecification.priceGreaterOrEqualsThan(minPrice));
         } if (maxPrice != null) {
             spec = spec.and(ProductSpecification.priceLessOrEqualsThan(maxPrice));
         }
-        return productRepository.findAll(spec, PageRequest.of(p -1, 10));
+
+        return productRepository.findAll(spec, PageRequest.of(p -1, 10)).map(ProductConverter::productToDto);
     }
 
-    public ProductDto getProductByID(Integer id) {
-        return productRepository.findById(id).map(p -> new ProductDto(p)).orElseThrow();
-    }
-
-    public TreeSet<ProductDto> getAllProducts() {
-        TreeSet<ProductDto> products = new TreeSet<>();
-        productRepository.findAll().forEach(p -> products.add(new ProductDto(p)));
-        return products;
+    public ProductDto findByID(Integer id) {
+        return productRepository.findById(id).map(ProductConverter::productToDto).orElseThrow();
     }
 
     public void deleteById(Integer id) {
         productRepository.deleteById(id);
     }
 
-    public Product addProduct(Product product) {
-        return productRepository.save(product);
+    public ProductDto add(ProductDto productDto) {
+        productValidator.validate(productDto);
+        productRepository.save(ProductConverter.dtoToProduct(productDto));
+        return productDto;
     }
 
-    public TreeSet<Customer> getProductCustomers(ProductDto productDto){
-        Product product = productRepository.findById(productDto.getId()).orElseThrow();
-        return new TreeSet<>(product.getCustomers());
+    @Transactional
+    public ProductDto update(ProductDto productDto) {
+        Product product = productRepository.findById(productDto.getId()).orElseThrow(
+                () -> new ValidateException(List.of("Продукт с id=" + productDto.getId() + " не существует")));
+        product.setTitle(productDto.getTitle());
+        product.setPrice(productDto.getPrice());
+        return productDto;
+    }
+
+    public TreeSet<CustomerDto> getProductCustomers(ProductDto productDto){
+        return new TreeSet<>(productDto.getCustomers());
     }
 }

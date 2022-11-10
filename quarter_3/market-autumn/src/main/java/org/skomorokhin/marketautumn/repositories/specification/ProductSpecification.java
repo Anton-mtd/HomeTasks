@@ -1,6 +1,6 @@
 package org.skomorokhin.marketautumn.repositories.specification;
 
-import org.skomorokhin.marketautumn.model.Product;
+import org.skomorokhin.marketautumn.model.entities.Product;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProductSpecification {

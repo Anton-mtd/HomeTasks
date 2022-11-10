@@ -1,7 +1,7 @@
 package org.skomorokhin.marketautumn.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.skomorokhin.marketautumn.model.Product;
+import org.skomorokhin.marketautumn.dto.ProductDto;
 import org.skomorokhin.marketautumn.services.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +16,9 @@ public class ProductController {
 
 
     @GetMapping("/showAll")
-    public Page<Product> getAllProducts(@RequestParam (name = "page", defaultValue = "1") Integer page,
-                                        @RequestParam(name = "min_price", required = false) Integer minPrice,
-                                        @RequestParam(name = "max_price", required = false) Integer maxPrice
+    public Page<ProductDto> getAllProducts(@RequestParam (name = "page", defaultValue = "1") Integer page,
+                                           @RequestParam(name = "min_price", required = false) Integer minPrice,
+                                           @RequestParam(name = "max_price", required = false) Integer maxPrice
     ) {
         if (page < 1) {
             page = 1;
@@ -28,21 +28,17 @@ public class ProductController {
 
 
     @PostMapping ("/product")
-    public void add(@RequestParam String title, @RequestParam Integer price) {
-        Product product = new Product(title,price);
-        productService.addProduct(product);
+    public void add(@RequestBody ProductDto productDto) {
+        productService.add(productDto);
     }
 
     @PutMapping("/product")
-    public void update(@RequestParam Integer id, @RequestParam String title, @RequestParam Integer price) {
-        Product product = new Product(title,price);
-        product.setId(id);
-        productService.addProduct(product);
+    public void update(@RequestBody ProductDto productDto) {
+        productService.update(productDto);
     }
 
     @DeleteMapping("/product")
     public void deleteProductById(@RequestParam Integer id) {
         productService.deleteById(id);
     }
-
 }

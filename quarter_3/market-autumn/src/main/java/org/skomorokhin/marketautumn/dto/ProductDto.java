@@ -1,27 +1,25 @@
 package org.skomorokhin.marketautumn.dto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.skomorokhin.marketautumn.model.Product;
+import lombok.NoArgsConstructor;
+import org.skomorokhin.marketautumn.model.entities.Customer;
 
-@Data
+import java.util.Set;
+
+@NoArgsConstructor
 @AllArgsConstructor
+@Data
+@Builder
 public class ProductDto implements Comparable<ProductDto> {
-
-    public ProductDto(Product p) {
-        this.id = p.getId();
-        this.title = p.getTitle();
-        this.price = p.getPrice();
-    }
-
 
     private Integer id;
 
-
     private String title;
-
 
     private Integer price;
 
+    private Set<Customer> customers;
 
     @Override
     public int compareTo(ProductDto o) {

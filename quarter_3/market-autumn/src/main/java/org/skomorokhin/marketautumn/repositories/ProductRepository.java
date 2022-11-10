@@ -1,11 +1,9 @@
 package org.skomorokhin.marketautumn.repositories;
 
-import org.skomorokhin.marketautumn.model.Product;
+import org.skomorokhin.marketautumn.model.entities.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.CrudRepository;
 
-import java.util.TreeSet;
-
-public interface ProductRepository extends CrudRepository<Product, Integer>, JpaSpecificationExecutor<Product> {
+public interface ProductRepository extends JpaRepository<Product, Integer>, JpaSpecificationExecutor<Product> {
 
 }
