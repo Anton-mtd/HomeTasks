@@ -1,21 +1,24 @@
-package org.skomorokhin.marketautumn.model;
+package org.skomorokhin.marketautumn.model.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.skomorokhin.marketautumn.model.entities.Customer;
+
 import javax.persistence.*;
 import java.util.Set;
 
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 @Entity
 @Table(name = "products")
 public class Product {
-
-    public Product(String title, Integer price) {
-        this.title = title;
-        this.price = price;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,38 +40,6 @@ public class Product {
     )
     private Set<Customer> customers;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public Set<Customer> getCustomers() {
-        return customers;
-    }
-
-    public void setCustomers(Set<Customer> customers) {
-        this.customers = customers;
-    }
-
     @Override
     public String toString() {
         return "Product{" +
@@ -77,5 +48,4 @@ public class Product {
                 ", price=" + price +
                 '}';
     }
-
 }

@@ -1,8 +1,10 @@
 package org.skomorokhin.marketautumn.repositories;
 
 
-import org.skomorokhin.marketautumn.model.Customer;
-import org.springframework.data.repository.CrudRepository;
+import org.skomorokhin.marketautumn.model.entities.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface CustomerRepository extends CrudRepository <Customer, Integer> {
+
+public interface CustomerRepository extends JpaRepository<Customer, Integer>, JpaSpecificationExecutor<Customer> {
 }

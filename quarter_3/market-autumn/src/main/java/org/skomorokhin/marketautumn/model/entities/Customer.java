@@ -1,16 +1,23 @@
-package org.skomorokhin.marketautumn.model;
+package org.skomorokhin.marketautumn.model.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.Set;
 
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 @Entity
 @Table(name = "customers")
-public class Customer implements Comparable<Customer> {
+public class Customer{
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -29,40 +36,11 @@ public class Customer implements Comparable<Customer> {
     )
     private Set<Product> products;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(Set<Product> products) {
-        this.products = products;
-    }
-
     @Override
     public String toString() {
         return "Customer{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
-    }
-
-    @Override
-    public int compareTo(Customer o) {
-        return this.getName().compareTo(o.getName());
     }
 }
