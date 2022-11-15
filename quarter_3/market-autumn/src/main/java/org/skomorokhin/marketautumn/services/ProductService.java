@@ -6,6 +6,7 @@ import org.skomorokhin.marketautumn.converters.ProductConverter;
 import org.skomorokhin.marketautumn.dto.CustomerDto;
 import org.skomorokhin.marketautumn.dto.ProductDto;
 import org.skomorokhin.marketautumn.exceptions.ValidateException;
+import org.skomorokhin.marketautumn.model.entities.Customer;
 import org.skomorokhin.marketautumn.model.entities.Product;
 import org.skomorokhin.marketautumn.repositories.ProductRepository;
 import org.skomorokhin.marketautumn.repositories.specification.ProductSpecification;
@@ -60,7 +61,7 @@ public class ProductService {
         return productDto;
     }
 
-    public TreeSet<CustomerDto> getProductCustomers(ProductDto productDto){
+    public TreeSet<Customer> getProductCustomers(ProductDto productDto){
         return new TreeSet<>(productDto.getCustomers());
     }
 }

@@ -60,6 +60,21 @@ VALUES (1, 1),
        (4, 12),
        (4, 9),
        (4, 22)
+       ;
+
+INSERT INTO roles (name)
+VALUES ('ROLE_ADMIN'),
+       ('ROLE_MANAGER'),
+       ('ROLE_CLIENT');
+
+INSERT INTO users (login, password, role_id)
+VALUES ('userAdmin', 'admin', 1),
+       ('userManager', 'manager', 2),
+       ('userClient', 'client', 3)
 ;
+
+
+
+
 
 
