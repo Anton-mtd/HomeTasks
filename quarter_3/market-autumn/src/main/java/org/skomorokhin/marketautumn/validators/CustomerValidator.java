@@ -2,10 +2,12 @@ package org.skomorokhin.marketautumn.validators;
 
 import org.skomorokhin.marketautumn.dto.CustomerDto;
 import org.skomorokhin.marketautumn.exceptions.ValidateException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class CustomerValidator {
 
     public void validate(CustomerDto customerDto) {
