@@ -17,7 +17,11 @@ public class ProductConverter {
     }
 
     public static ProductDto productToDto(Product product) {
-        return new ProductDto(product.getId(), product.getTitle(), product.getPrice(), product.getCustomers());
+        return ProductDto.builder()
+                .id(product.getId())
+                .title(product.getTitle())
+                .price(product.getPrice())
+                .build();
     }
 
 }
