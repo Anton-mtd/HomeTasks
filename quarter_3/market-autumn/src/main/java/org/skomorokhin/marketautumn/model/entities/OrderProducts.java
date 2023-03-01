@@ -7,25 +7,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 @Entity
-@Table (name = "roles")
-public class Role {
+@Table(name = "orders_products")
+public class OrderProducts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "quantity")
+    private Integer quantity;
 
-    @OneToMany (mappedBy = "role")
-    private List<User> users;
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 }

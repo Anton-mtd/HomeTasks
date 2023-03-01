@@ -1,68 +1,32 @@
-<!DOCTYPE html>
-<html ng-app="app">
-<head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
-    <script src="index.js"></script>
-    <title>Products</title>
-</head>
-<body>
-<div class="container" ng-controller="productsController">
-    <div id ="headerDiv">
-        <ul>
-            <li><a href ="products.html">products</a></li>
-            <li><a href ="customers.html">customers</a></li>
-        </ul>
-    </div>
-    <h3>Список продуктов</h3>
+<h1 class="mainTitle">Список товаров</h1>
 
-    <app-root></app-root>
-    <form id="filterForm" ng-submit="loadProductsByPrice()" method="get">
-        <label>MinPrice</label>
-        <input type="number" ng-model="p_price_min" placeholder="from_Price" required>
-        <label>MaxPrice</label>
-        <input type="number" ng-model="p_price_max" placeholder="to_Price" required>
-        <button class="btn btn-primary" type="submit">filter</button>
-    </form>
+<form class="filterForm" ng-submit="loadProducts()" method="get">
+  <label>MinPrice</label>
+  <input type="number" ng-model="filter.min_price" placeholder="from_price" required>
+  <label>MaxPrice</label>
+  <input type="number" ng-model="filter.max_price" placeholder="to_price" required>
+  <button class="btn btn-primary" type="submit">filter</button>
+</form>
 
-    <table class="table table-hover" cellpadding="0" cellspacing="0">
-        <tr>
-            <td>ID</td>
-            <td>Имя продукта</td>
-            <td>Стоимость</td>
-            <td>Кто купил товар</td>
-        </tr>
-        <tbody>
-        <tr ng-repeat="p in productsList">
-            <td>{{p.id}}</td>
-            <td>{{p.title}}</td>
-            <td>
-                <button class="btn btn-danger" ng-click="changePrice(p.id, -5)">-</button>
-                {{p.price}}
-                <button class="btn btn-primary" ng-click="changePrice(p.id, 5)">+</button>
-            </td>
-            <td>
-                <button class="btn btn-primary"
-                        ng-click="setProductToCustomers(p.id)"
-                        onclick="window.location.href = 'productToCustomer.html'"
-                >customers</button>
-            </td>
-            <td>
-                <button class="btn btn-danger" ng-click="deleteProduct(p.id)">delete</button>
-            </td>
-        </tbody>
-    </table>
-    <form id="addForm" ng-submit="addProduct()" method="post">
-        <label>Title</label>
-        <input type="text" ng-model="p_title" placeholder="product_name" required>
-        <label>Price</label>
-        <input type="number" ng-model="p_price" placeholder="product price" required>
-        <button class="btn btn-primary" type="submit" >add</button>
-    </form>
-</div>
-</body>
-</html>
+<table class="productsTable">
+  <tr>
+    <td>ID</td>
+    <td>Имя продукта</td>
+    <td>Стоимость</td>
+  </tr>
+  <tbody>
+  <tr ng-repeat="p in productsList">
+    <td>{{p.id}}</td>
+    <td>{{p.title}}</td>
+    <td>{{p.price}}</td>
+    <td ng-show="isUserLoggedIn()">
+      <button putToCart product="{{p.id}}">в корзину</button>
+    </td>
+  </tbody>
+</table>
+
+<ul>
+  <li style="display: inline" ng-repeat="p in pages">
+    <a href="" ng-click="loadProducts(p)">{{p}}</a>
+  </li>
+</ul>

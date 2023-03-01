@@ -26,51 +26,16 @@ VALUES ('Bread', 50),
        ('Potato', 40)
 ;
 
-INSERT INTO customers (name)
-VALUES ('Mike'),
-       ('John'),
-       ('Nick'),
-       ('Nicol'),
-       ('Natali')
-;
-
-INSERT INTO customers_products (customer_id, product_id)
-VALUES (1, 1),
-       (1, 4),
-       (1, 6),
-       (1, 16),
-       (1, 17),
-       (1, 7),
-       (2, 4),
-       (2, 16),
-       (2, 7),
-       (2, 13),
-       (2, 15),
-       (2, 8),
-       (3, 1),
-       (3, 21),
-       (3, 4),
-       (3, 17),
-       (3, 24),
-       (3, 6),
-       (4, 1),
-       (4, 10),
-       (4, 19),
-       (4, 15),
-       (4, 12),
-       (4, 9),
-       (4, 22)
-       ;
 
 INSERT INTO roles (name)
 VALUES ('ROLE_ADMIN'),
        ('ROLE_MANAGER'),
        ('ROLE_CLIENT');
 
-INSERT INTO users (login, password, role_id)
-VALUES ('userAdmin', 'admin', 1),
-       ('userManager', 'manager', 2),
-       ('userClient', 'client', 3)
+INSERT INTO users (login, pass, name, surname, email, role_id)
+VALUES ('userAdmin', '{bcrypt}$2a$10$ZImkEeZvRTBX8ElYp/A1guX4rH3YBCFLXePTu.z9AylnUaIGksOBy', 'Anton', 'Skomorokhin', 'admin@mail.ru', 1),
+       ('userManager', '{bcrypt}$2a$10$MpaVvecJx/f3sKs/X/wyF.D1yoxTT//fgOtsQIWSdcvqzjI12g7a6', 'Sergey', 'Golovin', 'manager@mail.ru', 2),
+       ('userClient', '{bcrypt}$2a$10$8MyaJc6K3vF4da/1r.35w.mOxTo2PZJVvgjJ/MTXZ5patw4CTjIJ2', 'Roman', 'Sidorov', 'customer@mail.ru', 3)
 ;
 
 

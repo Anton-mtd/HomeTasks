@@ -1,166 +1,229 @@
-var app = angular.module('app',[]);
+var app = angular.module('app', ['ngStorage', 'ngRoute'])
+
+app.config(function ($routeProvider) {
+    $routeProvider
+        .when("/", {
+            templateUrl: 'products.html',
+            controller: 'productsController'
+        })
+        .when("/cart", {
+            templateUrl: 'cart.html',
+            controller: 'cartController'
+        })
+        .when("/orders", {
+            templateUrl: 'orders.html',
+            controller: 'orderController'
+        })
+        .when("/orders/orderinfo/:id", {
+            templateUrl: 'orderinfo.html',
+            controller: 'orderController'
+    })
+});
+
+
+app.controller('userController', function ($scope, $rootScope, $http, $localStorage) {
+
+    $scope.cartProductList = "";
+    $scope.orderList = "";
+
+
+    $scope.userIsLoggedInView = function () {
+        $scope.logButton = "выйти";
+        $scope.regButtonView = {visible: false};
+        $scope.navButtonView = {visible: true};
+        $scope.logFormView = {visible: false};
+    };
+
+    $scope.userIsLoggedOutView = function () {
+        $scope.logButton = "войти";
+        $scope.regButtonView = {visible: true};
+        $scope.navButtonView = {visible: false}
+        $scope.logFormView = {visible: false};
+        $scope.regFormView = {visible:false};
+        document.location='#!/';
+    };
+
+    if ($localStorage.springWebUser) {
+        $scope.userIsLoggedInView();
+        $http.defaults.headers.common.Authorization = 'Bearer ' + $localStorage.springWebUser.token;
+    } else {
+        $scope.userIsLoggedOutView()
+    }
+
+    $scope.changeVisible = function (dom) {
+        dom.visible ? dom.visible = false : dom.visible = true;
+    };
+
+
+
+    $scope.logInOutButton = function () {
+        if ($scope.logButton === "выйти") {
+            $scope.clearUser();
+            $scope.userIsLoggedOutView();
+        } else {
+            $scope.changeVisible($scope.logFormView);
+        }
+    };
+
+    $scope.regButton = function () {
+        $scope.changeVisible($scope.regFormView);
+    };
+
+    $scope.tryToAuth = function () {
+        $http.post("/app/getAuth", $scope.user)
+            .then(function successCallback(response) {
+                    if (response.data.token) {
+                        $http.defaults.headers.common.Authorization = 'Bearer ' + response.data.token;
+                        $localStorage.springWebUser = {username: $scope.user.username, token: response.data.token};
+
+                        $scope.user.username = null;
+                        $scope.user.password = null;
+                        $scope.userIsLoggedInView();
+                    }
+                }, function errorCallback(response) {
+                    alert(response.data.message)
+                }
+            );
+    };
+
+
+    $scope.tryToRegist = function () {
+        $http.post("/app/getRegister", $scope.registration)
+            .then(function successCallback () {
+                alert("registration success")
+                $scope.registration = null;
+            }, function errorCallback (errors) {
+                let alertList = [];
+                for (let i = 0; i < Object.keys(errors.data).length ; i++) {
+                    let key = Object.keys(errors.data)[i];
+                    let value = Object.values(errors.data)[i];
+                    alertList.push(key + " : " + value);
+                }
+                alert(alertList.join("\n"));
+            })
+    };
+
+
+    $scope.clearUser = function () {
+        delete $localStorage.springWebUser;
+        $http.defaults.headers.common.Authorization = '';
+    };
+
+
+    $scope.authTimeIsOver = function () {
+        alert("время авторизации истекло!")
+        $scope.clearUser();
+        $scope.userIsLoggedOutView()
+    };
+
+
+    $rootScope.isUserLoggedIn = function () {
+        return $localStorage.springWebUser;
+    };
+
+});
 
 
 app.controller('productsController', function ($scope, $http) {
-    const contextPath = "/app";
 
-    $scope.setProducts = function () {
+    const contextPath = "/app/api/v1/products";
+
+
+    $scope.loadProducts = function (page) {
         $http({
-            url: contextPath + '/product/setList',
-            method: 'POST'
-        });
-    };
-
-    $scope.loadProducts = function () {
-        $http.get(contextPath + "/product/products")
-            .then(function (response) {
-                $scope.productsList = response.data;
-            });
-    };
-
-
-    $scope.changePrice = function (productId, delta) {
-        $http({
-            url: contextPath + '/product/change_price',
+            url: contextPath + "/showAll",
             method: 'GET',
             params: {
-                productId: productId,
-                delta: delta
+                page: page,
+                min_price: $scope.filter ? $scope.filter.min_price : null,
+                max_price: $scope.filter ? $scope.filter.max_price : null
             }
         }).then(function (response) {
-            $scope.loadProducts();
+            $scope.productsList = response.data.content;
+
+            let totalPages = response.data.totalPages;
+            let pagesList = [];
+            for (let i = 1; i <= totalPages; i++) {
+                pagesList[i - 1] = i;
+            }
+            $scope.pages = pagesList;
         });
     };
 
-    $scope.deleteProduct = function (productId) {
-        $http({
-            url: contextPath + '/product/delete',
-            method: 'DELETE',
-            params: {
-                id: productId
-            }
-            }).then(function (response) {
-            $scope.loadProducts();
-        });
-    };
 
-    $scope.addProduct = function () {
+    $scope.loadProducts();
+
+});
+
+
+app.controller('cartController', function ($scope, $http) {
+
+
+    $scope.showCart = function () {
         $http({
-            url: contextPath + '/product/add',
-            method: 'GET',
-            params: {
-                title: $scope.p_title,
-                price: $scope.p_price
+            url: "/app/cart/showCart",
+            method: 'GET'
+        }).then(function successCallback(response) {
+            $scope.cartProductList = response.data;
+            $scope.totalPrice = 0;
+            for (let i = 0; i < response.data.length; i++) {
+                $scope.totalPrice += response.data[i].productDto.price * response.data[i].quantity;
             }
-        }).then(function (response) {
-            $scope.loadProducts();
-        }).then(function (){
-            $scope.p_title = "";
-            $scope.p_price = "";
+        }, function errorCallback(error) {
+            if (error.status === 401) {
+                $scope.authTimeIsOver();
+            }
         })
     };
 
-    $scope.setProductToCustomers = function (productId) {
+
+    $scope.showCart();
+
+});
+
+
+app.controller('orderController', function ($scope, $http, $routeParams) {
+
+
+    $scope.showOrders = function () {
         $http({
-            url: contextPath + '/product/customerList',
-            method: 'POST',
-            params: {
-                id: productId
+            url: "/app/cart/showOrders",
+            method: 'GET'
+        }).then(function successCallback (response) {
+            $scope.orderList = response.data;
+        }, function errorCallback (error) {
+            if (error.status === 401) {
+                $scope.authTimeIsOver();
             }
-        });
+        })
     };
 
-    $scope.loadProductsByPrice = function () {
+
+    $scope.orderInfo = function () {
         $http({
-            url: contextPath + '/product/filterPrice',
+            url: "/app/cart/orderInfo",
             method: 'GET',
             params: {
-                min: $scope.p_price_min,
-                max: $scope.p_price_max
+                orderId: $routeParams['id']
             }
-        }).then(function (response) {
-            $scope.productsList = response.data;
-        }).then(function (response) {
-            $scope.loadProducts();
-        });
-    };
-
-    $scope.setProducts();
-    $scope.loadProducts();
-
-})
-
-app.controller('customersController', function ($scope, $http) {
-    const contextPath = "/app";
-
-
-    $scope.loadCustomers = function () {
-        $http.get(contextPath + "/customer/all")
-            .then(function (response) {
-                $scope.customerList = response.data;
-            });
-    };
-
-    $scope.setCustomerToProducts = function (customerId) {
-        $http({
-            url: contextPath + '/customer/order',
-            method: 'POST',
-            params: {
-                id: customerId
+        }).then(function successCallback (response){
+            $scope.totalPrice = 0;
+            for (let i = 0; i < response.data.length; i++) {
+                $scope.totalPrice += response.data[i].productDto.price * response.data[i].quantity;
             }
-        });
-    };
+            $scope.selectedOrder = response.data;
+        }, function errorCallback (error){
+            if (error.status === 401) {
+                $scope.authTimeIsOver();
+            }
+        })
+    }
 
-    $scope.loadCustomers();
+    if ($routeParams['id']) {
+        $scope.orderInfo();
+    } else {
+        $scope.showOrders();
+    }
+
 })
-
-app.controller('orderController', function ($scope, $http) {
-    const contextPath = "/app";
-
-    $scope.getCustomerToProducts = function () {
-        $http({
-            url: contextPath + '/customer/order',
-            method: 'GET'
-        }).then(function (response) {
-            $scope.customerToProducts = response.data;
-        });
-    };
-
-    $scope.getCustomer = function () {
-        $http({
-            url: contextPath + '/customer/current',
-            method: 'GET'
-        }).then(function (response) {
-            $scope.currentCustomer = response.data;
-        });
-    };
-
-    $scope.getCustomer();
-    $scope.getCustomerToProducts();
-})
-
-app.controller('productsForOrderCtrl', function ($scope, $http) {
-    const contextPath = "/app";
-
-    $scope.getProductToCustomers = function () {
-        $http({
-            url: contextPath + '/product/customerList',
-            method: 'GET'
-        }).then(function (response) {
-            $scope.productToCustomers = response.data;
-        });
-    };
-
-    $scope.getProduct = function () {
-        $http({
-            url: contextPath + '/product/current',
-            method: 'GET'
-        }).then(function (response) {
-            $scope.currentProduct = response.data;
-        });
-    };
-
-    $scope.getProduct();
-    $scope.getProductToCustomers()
-});
 

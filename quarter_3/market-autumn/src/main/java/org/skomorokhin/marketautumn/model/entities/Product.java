@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.skomorokhin.marketautumn.model.entities.Customer;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -31,14 +30,12 @@ public class Product {
     @Column(name = "price")
     private Integer price;
 
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(
-            name = "customers_products",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "customer_id")
-    )
-    private Set<Customer> customers;
+    @OneToMany(mappedBy = "product")
+    Set <CartProducts> cartProductsSet;
+
+    @OneToMany(mappedBy = "product")
+    Set <OrderProducts> orderProductsSet;
+
 
     @Override
     public String toString() {
