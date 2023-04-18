@@ -1,0 +1,28 @@
+SELECT
+f1.title as film1, days.type as dayF1, start_times.value as beginF1, durations.duration as durationF1, (start_times.value + durations.duration) AS endF1,
+tab1.title as film2, tab1.type as dayF2, tab1.value as beginF2, tab1.duration as durationF2, (tab1.value + tab1.duration) AS endF2
+FROM sessions AS s1
+JOIN films AS f1
+	ON f1.id = s1.film_id
+JOIN times
+	ON times.id = s1.time_id
+JOIN days
+	ON days.id = times.day_id
+JOIN start_times
+	ON start_times.id = times.start_time_id
+JOIN durations
+	ON durations.id = times.duration_id
+JOIN (SELECT f2.title, days.type, start_times.value, durations.duration, (start_times.value + durations.duration) FROM sessions AS s2
+	JOIN films as f2
+		ON f2.id = s2.film_id
+	JOIN times
+		ON times.id = s2.time_id
+	JOIN days
+		ON days.id = times.day_id
+	JOIN start_times
+		ON start_times.id = times.start_time_id
+	JOIN durations
+		ON durations.id = times.duration_id) AS tab1
+	   ON days.type = tab1.type AND tab1.value < (start_times.value + durations.duration) AND start_times.value < tab1.value
+
+	  ORDER BY beginF1;
